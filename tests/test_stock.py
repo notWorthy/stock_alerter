@@ -3,8 +3,6 @@ import pytest
 from stock_alerter import stock
 
 
-
-
 class TestStock:
     """Stock's """
 
@@ -32,3 +30,16 @@ class TestStock:
         sample_stock.update(datetime(2016, 9, 22), price = 10)
         sample_stock.update(datetime(2016, 9, 23), price = 8.4)
         assert sample_stock.price == pytest.approx(8.4)
+
+    @pytest.mark.parametrize("prices,result", [
+                                                ([8,10,12],True),
+                                                ([8,12,10],False),
+                                                ([8,10,10],False),
+                                                ])
+    def test_increasing_trend_is(self, sample_stock, prices, result):
+        """increasing_trend_is should be True if the previous three price updates were increases, else False."""
+        timestamps = [datetime(2016, 9, 22), datetime(2016, 9, 23), datetime(2016, 9, 24)]
+        for timestamp, price in zip(timestamps, prices):
+            sample_stock.update(timestamp, price)
+        assert sample_stock.increasing_trend_is is result
+
