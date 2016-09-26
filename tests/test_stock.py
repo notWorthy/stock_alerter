@@ -25,21 +25,19 @@ class TestStock:
             sample_stock.update(datetime(2016, 9, 23), price=-10)
         assert 'negative' in str(excinfo.value)
 
-    def test_price_should_give_latest_price(self, sample_stock):
+    def test_price_should_give_latest_price_by_timestamp(self, sample_stock):
         """price should return the latest price added."""
-        sample_stock.update(datetime(2016, 9, 22), price = 10)
         sample_stock.update(datetime(2016, 9, 23), price = 8.4)
+        sample_stock.update(datetime(2016, 9, 22), price = 10)
         assert sample_stock.price == pytest.approx(8.4)
 
-    @pytest.mark.parametrize("prices,result", [
-                                                ([8,10,12],True),
-                                                ([8,12,10],False),
-                                                ([8,10,10],False),
-                                                ])
-    def test_increasing_trend_is(self, sample_stock, prices, result):
+    trend_data = [ ([8,10,12],True), ([8,12,10],False), ([8,10,10],False), ]
+    trend_ids = ["increasing numbers are True", "decreasing numbers are False", "same numbers are False"]
+    @pytest.mark.parametrize("prices,expected",trend_data, ids=trend_ids )
+    def test_increasing_trend_is(self, sample_stock, prices, expected):
         """increasing_trend_is should be True if the previous three price updates were increases, else False."""
         timestamps = [datetime(2016, 9, 22), datetime(2016, 9, 23), datetime(2016, 9, 24)]
         for timestamp, price in zip(timestamps, prices):
             sample_stock.update(timestamp, price)
-        assert sample_stock.increasing_trend_is is result
+        assert sample_stock.increasing_trend_is is expected
 
